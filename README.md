@@ -2,6 +2,8 @@
 
 This repository contains source code for building a Discord bot using Python.
 
+![Docker Pulls](https://img.shields.io/docker/pulls/anuraj/discord-bot)
+
 ## How to configure and run this bot
 
 1. Clone the repository.

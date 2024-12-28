@@ -8,10 +8,10 @@ load_dotenv()
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
+NEW_YEAR = datetime(2025, 1, 1, 0, 0, 0)
+
 intents = discord.Intents.default()
-
 intents.message_content = True
-
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
@@ -39,6 +39,20 @@ async def greet(ctx):
 async def echo(ctx,arg):
     await ctx.send(f"Echoing: {arg}")
     
+@bot.command()
+async def countdown(ctx):
+    now = datetime.now()
+    if now >= NEW_YEAR:
+        await ctx.send("Happy New Year! 🎉🎆🎊")
+    else:
+        delta = NEW_YEAR - now
+        days, hours, minutes, seconds = delta.days, delta.seconds // 3600, (delta.seconds // 60) % 60, delta.seconds % 60
+        countdown_message = (
+            f"⏳ Countdown to New Year:\n"
+            f"**{days} days, {hours} hours, {minutes} minutes, {seconds} seconds** remaining!"
+        )
+        await ctx.send(countdown_message)    
+
 @bot.event
 async def on_command_error(ctx, error):
     await ctx.send(f"Error: {error}")

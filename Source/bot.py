@@ -12,6 +12,7 @@ DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 NEW_YEAR = datetime(2025, 1, 1, 0, 0, 0)
 scheduler = AsyncIOScheduler()
 channel = None
+last_message = None
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -62,23 +63,6 @@ async def countdown(ctx):
     now = datetime.now()
     if now >= NEW_YEAR:
         await ctx.send("Happy New Year! 🎉🎆🎊")
-    else:
-        delta = NEW_YEAR - now
-        days, hours, minutes, seconds = delta.days, delta.seconds // 3600, (delta.seconds // 60) % 60, delta.seconds % 60
-        countdown_message = (
-            f"⏳ Countdown to New Year:\n"
-            f"**{days} days, {hours} hours, {minutes} minutes, {seconds} seconds** remaining!"
-        )
-        await ctx.send(countdown_message)    
-    
-async def update_countdown():
-    global channel
-    if channel is None:
-        print("Channel is not set.")
-        return
-    now = datetime.now()
-    if now >= NEW_YEAR:
-        channel.send("Happy New Year! 🎉🎆🎊")
         scheduler.shutdown()
     else:
         delta = NEW_YEAR - now
@@ -87,6 +71,31 @@ async def update_countdown():
             f"⏳ Countdown to New Year:\n"
             f"**{days} days, {hours} hours, {minutes} minutes, {seconds} seconds** remaining!"
         )
-        await channel.send(countdown_message)
+        global last_message
+        last_message = await channel.send(countdown_message)   
+    
+async def update_countdown():
+    global last_message
+    global channel
+    if channel is None:
+        print("Channel is not set.")
+        return
+    
+    now = datetime.now()
+    if now >= NEW_YEAR:
+        if last_message:
+            await last_message.edit(content="Happy New Year! 🎉🎆🎊")
+        scheduler.shutdown()
+    else:
+        delta = NEW_YEAR - now
+        days, hours, minutes, seconds = delta.days, delta.seconds // 3600, (delta.seconds // 60) % 60, delta.seconds % 60
+        countdown_message = (
+            f"⏳ Countdown to New Year:\n"
+            f"**{days} days, {hours} hours, {minutes} minutes, {seconds} seconds** remaining!"
+        )
+        if last_message:
+            await last_message.edit(content=countdown_message)
+        else:
+            last_message = await channel.send(countdown_message)
 
 bot.run(DISCORD_BOT_TOKEN)

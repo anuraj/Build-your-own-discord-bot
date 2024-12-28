@@ -38,5 +38,9 @@ async def greet(ctx):
 @bot.command("echo")
 async def echo(ctx,arg):
     await ctx.send(f"Echoing: {arg}")
+    
+@bot.event
+async def on_command_error(ctx, error):
+    await ctx.send(f"Error: {error}")
 
 bot.run(DISCORD_BOT_TOKEN)
